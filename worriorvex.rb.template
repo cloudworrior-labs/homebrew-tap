@@ -10,7 +10,7 @@ cask "worriorvex" do
   desc "Local-first note-taking app and personal knowledge workspace"
   homepage "https://github.com/cloudworrior-labs/worriorvex"
 
-  depends_on macos: ">= :monterey"
+  depends_on macos: :monterey
 
   app "WorriorVex.app"
 
