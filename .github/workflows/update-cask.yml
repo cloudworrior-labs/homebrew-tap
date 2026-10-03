@@ -1,0 +1,43 @@
+name: Update cask
+
+# Rewrites Casks/worriorvex.rb from the newest WorriorVex release. Needs no secrets: releases are public
+# and the commit goes to this repository with its own token.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the latest release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo cloudworrior-labs/worriorvex --json tagName --jq .tagName)
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - name: Render the cask
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          base="https://github.com/cloudworrior-labs/worriorvex/releases/download/v$VERSION"
+          curl -sSL -o arm.dmg "$base/WorriorVex-$VERSION-macos-arm64.dmg"
+          curl -sSL -o intel.dmg "$base/WorriorVex-$VERSION-macos-x64.dmg"
+          arm=$(sha256sum arm.dmg | cut -d' ' -f1)
+          intel=$(sha256sum intel.dmg | cut -d' ' -f1)
+          sed -e "s/{{VERSION}}/$VERSION/" -e "s/{{SHA_ARM}}/$arm/" -e "s/{{SHA_INTEL}}/$intel/" worriorvex.rb.template > Casks/worriorvex.rb
+          rm -f arm.dmg intel.dmg
+      - name: Commit if changed
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/worriorvex.rb
+          git diff --cached --quiet || (git commit -m "Update worriorvex to $VERSION" && git push)
