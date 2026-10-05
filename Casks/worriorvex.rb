@@ -1,9 +1,9 @@
 cask "worriorvex" do
   arch arm: "arm64", intel: "x64"
 
-  version "0.5.6"
-  sha256 arm:   "35b8ae24b3fd9196e2cf0399efe907c4ffb161635eb4ff6381bfc4d8ca72604d",
-         intel: "ca8214b2f4ee52016ca153b6bc74ced8b21446c5e2b58850fa941b3de1efaf9e"
+  version "0.6.0"
+  sha256 arm:   "593f16867245c06b089462cb4032a049dd122ce70ce7a2d60ec0c2b5b856eaff",
+         intel: "8fe3ef8e1bc6dab29846d4a18aea735ce59d875ea8c90ba44219afd459e5ba15"
 
   url "https://github.com/cloudworrior-labs/worriorvex/releases/download/v#{version}/WorriorVex-#{version}-macos-#{arch}.dmg"
   name "WorriorVex"
